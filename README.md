@@ -24,5 +24,5 @@ Ahí están la documentación, las mediciones y la forma de pedirlo.
 
 ---
 
-*mirilla* — © 2026 Juan Carlos Isaza Arenas. Licencia **MIT**.
+*mirilla* — © 2026 Juan Carlos Isaza. Licencia **MIT**.
 La licencia no cambia: lo que cambia es por dónde se entrega el código.
