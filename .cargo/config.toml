@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT
+#
+# TODAS las dependencias salen de `vendor/`, dentro del repositorio. No se
+# descarga nada: ni el índice de crates.io, ni un `.crate`.
+#
+# El positivo de control NO es `--offline`, que solo prueba que no salió a la red
+# pudiendo tirar de la caché de `~/.cargo`. Lo que discrimina es la caché VACÍA:
+#
+#     CARGO_HOME=$(mktemp -d) cargo test --offline
+#
+# POR QUÉ — decisión de Juan, 2026-08-14: «no podemos depender de herramientas
+# online hasta saber que todo es seguro, y eso va a tardar». El protocolo «solo
+# local» sacó el CÓDIGO de los registros; esto saca la CONSTRUCCIÓN.
+#
+# Aquí cuesta poco y vale mucho: mirilla tiene DOS dependencias —`libc` y
+# `serde_json`— y la vendorizan sus consumidores igualmente. Que su propio árbol
+# no toque la red la hace comprobable por sí sola.
+#
+# Y HAY UN ESLABÓN QUE CARGO NO VERIFICA: comprueba `Cargo.lock` ↔ campo
+# `package` y campo `files` ↔ bytes, pero NO `package` ↔ `files`. Editar un
+# archivo Y su entrada en `files` compila en silencio. Lo ancla, tras cada
+# re-vendorizado:
+#
+#     CARGO_HOME=$(mktemp -d) cargo vendor "$D" && diff -r --brief vendor "$D"
+#
+# Rutas RELATIVAS: cargo las escribe absolutas y eso ata el repo a esta máquina.
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"

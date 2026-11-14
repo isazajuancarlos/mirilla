@@ -1,0 +1,52 @@
+# EL VERDE LOCAL DE `mirilla`. NO lo corre GitHub.
+#
+# Actions está apagado en toda la cuenta desde el protocolo «solo local»
+# (2026-08-10). Este archivo existe porque **es la definición del verde**, y la
+# lee `conocimiento/cupo/verde_local.py`:
+#
+#     python3 /mnt/data/conocimiento/cupo/verde_local.py mirilla
+#
+# Ese guion abre este archivo, saca los `run:` en su orden y los ejecuta, para
+# que «el comando exacto del CI» no sea una frase que se copia a mano.
+#
+# POR QUÉ IMPORTA MÁS AQUÍ QUE EN OTROS: `mirilla` la consumen CINCO
+# repositorios —informes, medico, chasqui, inventario y nexus— por `rev` contra
+# el espejo. Un fallo suyo no se queda en casa: el 2026-08-13 una regresión de
+# `entrar` dejó inservible el banco de navegador de medico, y no se vio hasta
+# que ese consumidor migró. Su verde tiene que estar declarado.
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.ref == 'refs/heads/main' && format('-{0}', github.sha) || '' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    # El techo, no la duración esperada.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      # EL BANCO ARRANCA CHROMIUM DE VERDAD y no se salta si falta: falla con su
+      # nombre. Es la razón de ser de esta librería —cruzar la frontera del
+      # navegador (directiva 28)— así que un verde sin navegador no sería verde.
+      # LOS PASOS VAN CON `name:`, y no es estilo: `verde_local.py` registra los
+      # saltos de local POR NOMBRE (`conocimiento/cupo/verde_local.json`). Un
+      # paso sin nombre no se puede saltar, y este intentaría correr `apt-get`
+      # en una máquina openSUSE.
+      - name: Instalar Chromium
+        run: sudo apt-get update && sudo apt-get install -y chromium-browser
+      - name: Pruebas
+        run: cargo test
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings

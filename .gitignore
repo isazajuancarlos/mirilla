@@ -1,0 +1,6 @@
+/target
+
+# --- vendor/: árbol GENERADO; ninguna regla de arriba le aplica ---
+# Solo se ve CLONANDO: `git status` no lista lo ignorado, y reglas globales
+# como `target/`, `*.bin` o `*.key` se tragan archivos legítimos.
+!vendor/**

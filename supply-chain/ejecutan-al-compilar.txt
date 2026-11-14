@@ -1,0 +1,71 @@
+# Lo que ejecuta código en NUESTRA máquina al compilar.
+#
+# Cada línea es `<objeto-git> <ruta>`. Lo genera y lo compara
+# `conocimiento/lo-que-corre-al-compilar`.
+#
+# UNA LÍNEA NUEVA AQUÍ ES CÓDIGO NUEVO QUE CORRE AL COMPILAR. Antes de
+# aceptarla, mírala: es el vector por el que entraron los gusanos de npm
+# y del AUR — no un paquete nuevo, una VERSIÓN nueva de uno que ya usabas.
+#
+# QUÉ ENTRA: el script de construcción de cada crate —el declarado con
+# `build =`, no solo el que se llama `build.rs`—, todo `.rs` que ese
+# script arrastre por `mod` o `include!`, las fuentes NATIVAS que compila
+# o enlaza (`.c`, `.S`, `.o`, `.a`…), los crates proc-macro y las
+# librerías que un `[build-dependencies]` nombra.
+#
+# NO SE FILTRA POR PLATAFORMA, y es deliberado: entran también los `.a` de
+# `winapi-*-windows-gnu`, que en Linux no se enlazan nunca. Filtrar por el
+# objetivo de HOY dejaría la superficie ensancharse en silencio el día que
+# se cruce-compile. El manifiesto no se lee entero: se lee su DIFF.
+#
+# LO QUE ESTO **NO** DICE, y se escribe porque decía lo contrario hasta el
+# 2026-08-14: NO es «el único momento en que puede entrar algo». El árbol
+# del PRODUCTO está congelado; el VERDE no. El CI hace `cargo install` de
+# cargo-audit y cargo-deny, que NO pasan por `vendor/` —medido: `cargo
+# install` ignora la sustitución de fuentes— y compilan sus propios
+# `build.rs` sin vigilar. Lo dijo la revisión de seguridad de ese día.
+#
+# TAMPOCO cubre lo que ENTRA en el binario sin correr al compilar: el
+# `src/` de cada crate. Eso lo cubre el anclaje contra crates.io
+# (`cargo vendor` a un temporal + `diff -r`), que hoy es un comando en un
+# comentario y no un paso — está registrado como tarea.
+#
+# Esto NO es una barrera criptográfica: quien pueda escribir en vendor/
+# puede escribir aquí. Lo que hace es que el cambio se VEA en el diff.
+# piezas vigiladas: 36
+67da9c63b02f10a494995155b491ff3ba01b9305 vendor/libc/build.rs
+fc5f81f832b5de7a1049486af89f72f046d47903 vendor/libc/etc/libc-util.py
+26c3ed1bdcc51938a5ddffa89aeac7b333631da8 vendor/proc-macro2/build.rs
+50f98cb3bda60408b64c0e88a772486a692f9b07 vendor/quote/build.rs
+3a8f4196cf891f5592ff7564e52343ffc2c95a57 vendor/serde/build.rs
+e3b8228efd706e83fc27cdce79e880053da9b1ec vendor/serde_core/build.rs
+ea49e9f714c6863ac9d4341d3084b56c5443cc4b vendor/serde_derive/src/bound.rs
+e7b8579d0059aee0c2e8baec9534fe667ea5fde5 vendor/serde_derive/src/de.rs
+6f5094ff4f7d7c01478a4ea97974dfefffbb0181 vendor/serde_derive/src/de/enum_.rs
+ead66acbdc2c974852ebc13ee4508ebc79bad632 vendor/serde_derive/src/de/enum_adjacently.rs
+1a4c36b4f3d8d454df5e29e6ed59deb2cfef04ee vendor/serde_derive/src/de/enum_externally.rs
+b669eef7e813c597588db348979e82b00ebbbf88 vendor/serde_derive/src/de/enum_internally.rs
+f66d98de1f867e40d07ff1051785ca4edc1924fa vendor/serde_derive/src/de/enum_untagged.rs
+8e67b96310ce6c60ffe34f6764b6c704d62cbdef vendor/serde_derive/src/de/identifier.rs
+6a5da232acda9c961c380fe78f675d94970ce1ce vendor/serde_derive/src/de/struct_.rs
+a76089fe658ecdaf8388a88a2586a3f8dea7fec9 vendor/serde_derive/src/de/tuple.rs
+0d15ef4db5cf95337f96d633882602773ad18aaf vendor/serde_derive/src/de/unit.rs
+3abdc1b25e258c5a503a74d6e52b19ef764c5ee0 vendor/serde_derive/src/deprecated.rs
+e0bca647aca0a9879a0356d13e46ce4202a10e19 vendor/serde_derive/src/dummy.rs
+6627c2669952e6eaa5b1d18145a0d2f35612ca76 vendor/serde_derive/src/fragment.rs
+1b89c6ad1a4d7d8ea5aa5606ea366faa0a62c73a vendor/serde_derive/src/internals/ast.rs
+c0f08f450676df98419a247827ca7ed3a180d3a2 vendor/serde_derive/src/internals/attr.rs
+8c8c02e75780eadfb8944578ddd2196239ca8d44 vendor/serde_derive/src/internals/case.rs
+da2a0fbdc8c01f88b9cc2890b771f45102a3c3c3 vendor/serde_derive/src/internals/check.rs
+30e1a7236053a51709bd59459e99ef6fb7595317 vendor/serde_derive/src/internals/ctxt.rs
+cd1e8105283a32b7baa529c37037c4b32518f5d7 vendor/serde_derive/src/internals/mod.rs
+4c59f9636d32ed090e71e5a7a7358e0417a15069 vendor/serde_derive/src/internals/name.rs
+ca0d54f635a3d49f3f7725cb3daca52b222c1322 vendor/serde_derive/src/internals/receiver.rs
+dcec7017b3155b6a8314b342b82010d3c005d914 vendor/serde_derive/src/internals/respan.rs
+59ef8de7c48133f14c737839a257ee505f6d9fa7 vendor/serde_derive/src/internals/symbol.rs
+7fcd1f7d061422578206a0567d73d6acb6794914 vendor/serde_derive/src/lib.rs
+b6173bb1925443d5e356174fdce314655af2aed6 vendor/serde_derive/src/pretend.rs
+6eb3b0febe20c64ce7576907978146503a6b6e35 vendor/serde_derive/src/ser.rs
+941cea40c1e3f1f22d6a08ff4ce4d93fc10e5bb3 vendor/serde_derive/src/this.rs
+bbf4a749bb4b8042c2ac11cb3d938b773a83b134 vendor/serde_json/build.rs
+b07ec6e853ab01245846d31b9feb6c92b1cdd1d1 vendor/zmij/build.rs

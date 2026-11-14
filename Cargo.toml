@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "mirilla"
+version = "0.1.0"
+edition = "2021"
+# LTS de facto y no la última por serlo (directiva 35). 1.85 es el MSRV que ya
+# usan los consumidores; subirlo aquí los obligaría a subir a ellos.
+rust-version = "1.85"
+license = "MIT"
+authors = ["Juan Carlos Isaza"]
+description = "Conduce un Chromium sin cabeza por CDP sobre una tubería, para probar pantallas de verdad. Sin puerto, sin WebSocket, sin npm."
+repository = "https://github.com/isazajuancarlos/mirilla"
+readme = "README.md"
+keywords = ["cdp", "chromium", "headless", "e2e", "testing"]
+categories = ["development-tools::testing"]
+# Publicar en crates.io es una decisión aparte y cada vez (directiva 10). El
+# repositorio es público; el registro es otra cosa.
+publish = false
+
+[dependencies]
+# Dos y ninguna más. `libc` solo por `pipe`, `dup` y `dup2`; `serde_json` porque
+# CDP es JSON. Un arnés de pruebas que arrastra un árbol de dependencias es un
+# arnés que hay que auditar.
+libc = "0.2"
+serde_json = "1"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[dev-dependencies]
+# Solo el banco: pregunta al SISTEMA si quedó un grupo de procesos vivo, en vez
+# de creerse lo que el código dice haber matado.
+libc = "0.2"
